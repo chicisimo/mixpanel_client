@@ -6,6 +6,9 @@
 #
 # Copyright (c) 2009+ Keolo Keagy
 # See LICENSE for details
+
+require "json"
+
 module Mixpanel
   # Utilities to assist generating and requesting URIs
   class URI
@@ -15,7 +18,13 @@ module Mixpanel
     end
 
     def self.encode(params)
-      params.map { |key, val| "#{key}=#{CGI.escape(val.to_s)}" }.sort.join('&')
+      params.map do |key, val|
+        if val.is_a?(Hash) || val.is_a?(Array)
+          "#{key}=#{CGI.escape(val.to_json)}"
+        else
+          "#{key}=#{CGI.escape(val.to_s)}"
+        end
+      end.sort.join('&')
     end
 
     def self.get(uri)

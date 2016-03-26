@@ -22,9 +22,13 @@ module Mixpanel
       # @return [String] md5 hash signature required by mixpanel data API
       def self.generate_signature(args, api_secret)
         Digest::MD5.hexdigest(
-          args.map { |key, val| "#{key}=#{val}" }
-          .sort
-          .join +
+          args.map do |key, val|
+            if val.is_a?(Hash) || val.is_a?(Array)
+              "#{key}=#{val.to_json}"
+            else
+              "#{key}=#{val.to_s}"
+            end
+          end.sort.join +
           api_secret
         )
       end
