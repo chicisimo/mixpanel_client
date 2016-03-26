@@ -47,6 +47,20 @@ describe Mixpanel::URI do
         'hey=%21%40%23%24%25%5E%26%2A%28%29%5C%2F%22%C3%9C&soo=h%C3%ABll%C3%B6%3F' # rubocop:disable LineLength
       )
     end
+
+    it 'works with complex structures' do
+      params = {
+        something: [{
+          random: {
+            irrelevant: [{b:["c"]}, {d:["e"]}]
+          }
+        }]
+      }
+
+      Mixpanel::URI.encode(params).should eq(
+        "something=#{CGI.escape('[{"random":{"irrelevant":[{"b":["c"]},{"d":["e"]}]}}]')}" # rubocop:disable LineLength
+      )
+    end
   end
 
   describe '.get' do
